@@ -4,7 +4,7 @@
 const holes = document.querySelectorAll('.hole');
 const moles = document.querySelectorAll('.mole');
 const startButton = document.getElementById('start');
-const scoreDisplay = document.getElementById('score'); 
+const scoreDisplay = document.getElementById('score');
 const timerDisplay = document.getElementById('timer');
 
 // ==============================
@@ -98,6 +98,7 @@ function updateTimer() {
   } else {
     clearInterval(timer);
     stopGame();
+    alert(`Game Over! Your score: ${points}`);
   }
 }
 
@@ -133,17 +134,15 @@ function setDuration(duration) {
 function stopGame() {
   clearInterval(timer);
   stopAudio(song);
-  return "game stopped";
 }
 
 function startGame() {
   clearScore();
   stopGame();
-  setDuration(30); // Game duration in seconds
+  setDuration(30);
   startTimer();
   showUp();
   loopAudio(song);
-  return "game started";
 }
 
 // ==============================
@@ -151,6 +150,7 @@ function startGame() {
 // ==============================
 moles.forEach(mole => mole.addEventListener('click', whack));
 startButton.addEventListener("click", startGame);
+
 
 
 // Please do not modify the code below.
