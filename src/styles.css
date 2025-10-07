@@ -77,18 +77,41 @@ h2 {
    ============================== */
 .grid {
   width: 600px;
-  height: 400px;
   display: flex;
   flex-wrap: wrap;
-  margin: 0 auto;
-  position: relative;
+  margin: 20px auto;
 }
 
 .hole {
   flex: 1 0 33.33%;
+  height: 120px;
+  margin: 5px;
   position: relative;
   overflow: hidden;
-  perspective: 100px; /* for 3D effect on mole */
+  border: 2px solid black;
+  border-radius: 10px;
+  perspective: 100px;
 }
 
-.hole:after
+/* Mole styles */
+.mole {
+  position: absolute;
+  bottom: -100px; /* hidden below the hole */
+  left: 50%;
+  width: 80px;
+  height: 80px;
+  background: url('https://cdn-icons-png.flaticon.com/512/616/616408.png') no-repeat center center;
+  background-size: contain;
+  transform: translateX(-50%);
+  transition: bottom 0.3s;
+}
+
+/* Show mole */
+.hole.show .mole {
+  bottom: 0;
+}
+
+/* Hit animation */
+.mole.hit {
+  transform: translateX(-50%) scale(0.8);
+}
