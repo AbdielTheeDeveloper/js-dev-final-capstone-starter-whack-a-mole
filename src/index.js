@@ -1,7 +1,6 @@
 const holes = document.querySelectorAll('.hole');
 const moles = document.querySelectorAll('.mole');
 const startButton = document.querySelector('#start');
-// TODO: Add the missing query selectors:
 const score = document.querySelector('#score'); 
 const timerDisplay = document.querySelector('#timer');
 
@@ -77,36 +76,25 @@ function toggleVisibility(hole) {
   return hole; 
 }
 
-
-/**
-*
-* This function increments the points global variable and updates the scoreboard.
-* Use the `points` global variable that is already defined and increment it by 1.
-* After the `points` variable is incremented proceed by updating the scoreboard
-* that you defined in the `index.html` file. To update the scoreboard you can use 
-* `score.textContent = points;`. Use the comments in the function as a guide 
-* for your implementation:
-*
-*/
 function updateScore() {
-  // TODO: Write your code here
-
+  points += 1;
+  const score = document.getElementById("score");
+  if (score) {
+    score.textContent = points;
+  }
   return points;
 }
 
-/**
-*
-* This function clears the score by setting `points = 0`. It also updates
-* the board using `score.textContent = points`. The function should return
-* the points.
-*
-*/
+
 function clearScore() {
-  // TODO: Write your code here
-  // points = 0;
-  // score.textContent = points;
+  points = 0;
+  const score = document.getElementById("score");
+  if (score) {
+    score.textContent = points;
+  }
   return points;
 }
+
 
 /**
 *
@@ -132,30 +120,35 @@ function startTimer() {
   return timer;
 }
 
-/**
-*
-* This is the event handler that gets called when a player
-* clicks on a mole. The setEventListeners should use this event
-* handler (e.g. mole.addEventListener('click', whack)) for each of
-* the moles.
-*
-*/
-function whack(event) {
-  // TODO: Write your code here.
-  // call updateScore()
+const moles = document.querySelectorAll('.mole');
+let points = 0;
+const score = document.getElementById('score');
+
+function updateScore() {
+  points++;
+  if (score) {
+    score.textContent = points;
+  }
+  console.log(points);
   return points;
 }
 
-/**
-*
-* Adds the 'click' event listeners to the moles. See the instructions
-* for an example on how to set event listeners using a for loop.
-*/
-function setEventListeners(){
-  // TODO: Write your code here
-
+function whack(event) {
+  console.log("whack!");
+  if (!event.target.classList.contains('hit')) {
+    event.target.classList.add('hit');
+    updateScore();
+    setTimeout(() => event.target.classList.remove('hit'), 500);
+  }
+}
+function setEventListeners() {
+  for (let i = 0; i < moles.length; i++) {
+    moles[i].addEventListener('click', whack);
+  }
   return moles;
 }
+setEventListeners();
+
 
 /**
 *
