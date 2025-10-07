@@ -96,29 +96,31 @@ function clearScore() {
 }
 
 
-/**
-*
-* Updates the control board with the timer if time > 0
-*
-*/
+let time = 30; 
+let timer; 
+const timerDisplay = document.getElementById('timer'); 
+
 function updateTimer() {
-  // TODO: Write your code here.
-  // hint: this code is provided to you in the instructions.
-  
+  if (time > 0) {
+    time -= 1;
+    if (timerDisplay) {
+      timerDisplay.textContent = time;
+    }
+  } else {
+    clearInterval(timer);
+  }
   return time;
 }
 
-/**
-*
-* Starts the timer using setInterval. For each 1000ms (1 second)
-* the updateTimer function get called. This function is already implemented
-*
-*/
 function startTimer() {
-  // TODO: Write your code here
-  // timer = setInterval(updateTimer, 1000);
+  if (timerDisplay) {
+    timerDisplay.textContent = time; 
+  }
+  timer = setInterval(updateTimer, 1000);
   return timer;
 }
+startTimer();
+
 
 const moles = document.querySelectorAll('.mole');
 let points = 0;
