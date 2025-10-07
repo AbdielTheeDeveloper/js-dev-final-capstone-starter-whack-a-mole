@@ -47,29 +47,14 @@ function chooseHole(holes) {
   return hole;
 }
 
-/**
-*
-* Calls the showUp function if time > 0 and stops the game if time = 0.
-*
-* The purpose of this function is simply to determine if the game should
-* continue or stop. The game continues if there is still time `if(time > 0)`.
-* If there is still time then `showUp()` needs to be called again so that
-* it sets a different delay and a different hole. If there is no more time
-* then it should call the `stopGame()` function. The function also needs to
-* return the timeoutId if the game continues or the string "game stopped"
-* if the game is over.
-*
-*  // if time > 0:
-*  //   timeoutId = showUp()
-*  //   return timeoutId
-*  // else
-*  //   gameStopped = stopGame()
-*  //   return gameStopped
-*
-*/
 function gameOver() {
-  // TODO: Write your code here
-  
+  if (time > 0) {
+    const timeoutId = showUp();
+    return timeoutId;
+  } else {
+    const gameStopped = stopGame();
+    return gameStopped;
+  }
 }
 
 function showUp() {
@@ -195,31 +180,16 @@ function stopGame(){
   return "game stopped";
 }
 
-/**
-* This function starts the game when the `startButton` is clicked and initializes the game by performing the following steps: 
-
- * 1. Clears the score using `clearScore()`. 
-
- * 2. Sets the game duration using `setDuration()`. 
-
- * 3. Sets up event listeners on the moles using `setEventListeners()`.
-
- * 4. Starts the game timer by calling `startTimer()`.  
-
- * 5. Begins the game loop by calling `showUp()` to display moles. 
-
-
- * Note: Simply uncommenting `setDuration(10);` and `showUp();` is not enough. To make the game work, ensure all necessary functions listed above are called to initialize the score, timer, event listeners, and mole appearances. 
-*/
-function startGame(){
-  //clearScore();
-  //stopGame();   //optional
-  //setDuration(10);
-  //setEventListeners();
-  //startTimer();
-  //showUp();
+function startGame() {
+  clearScore();       
+  stopGame(); 
+  setDuration(10);    
+  setEventListeners(); 
+  startTimer();        
+  showUp();         
   return "game started";
 }
+
 
 startButton.addEventListener("click", startGame);
 
