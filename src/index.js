@@ -106,17 +106,11 @@ function showAndHide(hole, delay){
   return timeoutID;
 }
 
-/**
-*
-* Adds or removes the 'show' class that is defined in styles.css to 
-* a given hole. It returns the hole.
-*
-*/
-function toggleVisibility(hole){
-  // TODO: add hole.classList.toggle so that it adds or removes the 'show' class.
-  
-  return hole;
+function toggleVisibility(hole) {
+  hole.classList.toggle('show'); 
+  return hole; 
 }
+
 
 /**
 *
