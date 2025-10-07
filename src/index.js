@@ -1,196 +1,114 @@
+// ==============================
+// SELECTORS
+// ==============================
 const holes = document.querySelectorAll('.hole');
 const moles = document.querySelectorAll('.mole');
-const startButton = document.querySelector('#start');
-const score = document.querySelector('#score'); 
-const timerDisplay = document.querySelector('#timer');
+const startButton = document.getElementById('start');
+const scoreDisplay = document.getElementById('score'); 
+const timerDisplay = document.getElementById('timer');
 
-
-let time = 0;
+// ==============================
+// GAME VARIABLES
+// ==============================
+let time = 30; // game duration in seconds
 let timer;
-let lastHole = 0;
+let lastHole = null;
 let points = 0;
 let difficulty = "hard";
 
+// Audio
+const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/hit.mp3?raw=true");
+const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
 
+// ==============================
+// UTILITY FUNCTIONS
+// ==============================
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-console.log("A random integer between 0 and 10");
-console.log(randomInteger(0, 10));
-console.log("Another random integer between 0 and 10");
-console.log(randomInteger(0, 10));
-console.log("A random number between 600 and 1200");
-console.log(randomInteger(600, 1200));
-
 function setDelay(difficulty) {
-  if (difficulty === "easy") {
-    return 1500;
-  } else if (difficulty === "normal") {
-    return 1000;
-  } else if (difficulty === "hard") {
-    return randomInteger(600, 1200);
-  } else {
-    // default fallback
-    return 1000;
-  }
+  if (difficulty === "easy") return 1500;
+  if (difficulty === "normal") return 1000;
+  if (difficulty === "hard") return randomInteger(600, 1200);
+  return 1000; // default
 }
 
 function chooseHole(holes) {
-  const index = randomInteger(0, 8);
+  const index = randomInteger(0, holes.length - 1);
   const hole = holes[index];
-  if (hole === lastHole) {
-    return chooseHole(holes);
-  }
+  if (hole === lastHole) return chooseHole(holes);
   lastHole = hole;
   return hole;
 }
 
-function gameOver() {
-  if (time > 0) {
-    const timeoutId = showUp();
-    return timeoutId;
-  } else {
-    const gameStopped = stopGame();
-    return gameStopped;
-  }
-}
-
-function showUp() {
-  let delay = setDelay(difficulty);
-  const hole = chooseHole(holes);
-  return showAndHide(hole, delay);
+// ==============================
+// MOLE VISIBILITY
+// ==============================
+function toggleVisibility(hole) {
+  hole.classList.toggle('show'); 
 }
 
 function showAndHide(hole, delay) {
   toggleVisibility(hole);
-  const timeoutID = setTimeout(() => {
-    toggleVisibility(hole); 
-    gameOver(); 
+  return setTimeout(() => {
+    toggleVisibility(hole);
+    if (time > 0) showUp();
   }, delay);
-  return timeoutID;
 }
 
-function toggleVisibility(hole) {
-  hole.classList.toggle('show'); 
-  return hole; 
+function showUp() {
+  const delay = setDelay(difficulty);
+  const hole = chooseHole(holes);
+  return showAndHide(hole, delay);
 }
 
+// ==============================
+// SCORE
+// ==============================
 function updateScore() {
-  points += 1;
-  const score = document.getElementById("score");
-  if (score) {
-    score.textContent = points;
-  }
-  return points;
+  points++;
+  if (scoreDisplay) scoreDisplay.textContent = points;
+  audioHit.play();
 }
-
 
 function clearScore() {
   points = 0;
-  const score = document.getElementById("score");
-  if (score) {
-    score.textContent = points;
-  }
-  return points;
+  if (scoreDisplay) scoreDisplay.textContent = points;
 }
 
-
-let time = 30; 
-let timer; 
-const timerDisplay = document.getElementById('timer'); 
-
-function updateTimer() {
-  if (time > 0) {
-    time -= 1;
-    if (timerDisplay) {
-      timerDisplay.textContent = time;
-    }
-  } else {
-    clearInterval(timer);
-  }
-  return time;
-}
-
-function startTimer() {
-  if (timerDisplay) {
-    timerDisplay.textContent = time; 
-  }
-  timer = setInterval(updateTimer, 1000);
-  return timer;
-}
-startTimer();
-
-
-const moles = document.querySelectorAll('.mole');
-let points = 0;
-const score = document.getElementById('score');
-
-function updateScore() {
-  points++;
-  if (score) {
-    score.textContent = points;
-  }
-  console.log(points);
-  return points;
-}
-
+// ==============================
+// WHACK FUNCTION
+// ==============================
 function whack(event) {
-  console.log("whack!");
   if (!event.target.classList.contains('hit')) {
     event.target.classList.add('hit');
     updateScore();
     setTimeout(() => event.target.classList.remove('hit'), 500);
   }
 }
-function setEventListeners() {
-  for (let i = 0; i < moles.length; i++) {
-    moles[i].addEventListener('click', whack);
+
+// ==============================
+// TIMER
+// ==============================
+function updateTimer() {
+  if (time > 0) {
+    time--;
+    if (timerDisplay) timerDisplay.textContent = time;
+  } else {
+    clearInterval(timer);
+    stopGame();
   }
-  return moles;
-}
-setEventListeners();
-
-
-/**
-*
-* This function sets the duration of the game. The time limit, in seconds,
-* that a player has to click on the sprites.
-*
-*/
-function setDuration(duration) {
-  time = duration;
-  return time;
 }
 
-/**
-*
-* This function is called when the game is stopped. It clears the
-* timer using clearInterval. Returns "game stopped".
-*
-*/
-function stopGame(){
-  // stopAudio(song);  //optional
-  clearInterval(timer);
-  return "game stopped";
+function startTimer() {
+  if (timerDisplay) timerDisplay.textContent = time; 
+  timer = setInterval(updateTimer, 1000);
 }
 
-function startGame() {
-  clearScore();       
-  stopGame(); 
-  setDuration(10);    
-  setEventListeners(); 
-  startTimer();        
-  showUp();         
-  return "game started";
-}
-
-
-startButton.addEventListener("click", startGame);
-
-const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/hit.mp3?raw=true");
-const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
-
+// ==============================
+// AUDIO CONTROL
+// ==============================
 function playAudio(audioObject) {
   audioObject.play();
 }
@@ -202,11 +120,38 @@ function loopAudio(audioObject) {
 
 function stopAudio(audioObject) {
   audioObject.pause();
+  audioObject.currentTime = 0;
 }
 
-function play(){
-  playAudio(song);
+// ==============================
+// GAME CONTROL
+// ==============================
+function setDuration(duration) {
+  time = duration;
 }
+
+function stopGame() {
+  clearInterval(timer);
+  stopAudio(song);
+  return "game stopped";
+}
+
+function startGame() {
+  clearScore();
+  stopGame();
+  setDuration(30); // Game duration in seconds
+  startTimer();
+  showUp();
+  loopAudio(song);
+  return "game started";
+}
+
+// ==============================
+// INITIALIZE
+// ==============================
+moles.forEach(mole => mole.addEventListener('click', whack));
+startButton.addEventListener("click", startGame);
+
 
 // Please do not modify the code below.
 // Used for testing purposes.
