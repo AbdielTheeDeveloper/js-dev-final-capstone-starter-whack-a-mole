@@ -117,44 +117,6 @@ h2 {
 }
 
 /* ==============================
-   MUTE BUTTON
-   ============================== */
-#mute {
-  font-size: 20px;
-  padding: 8px 20px;
-  margin-left: 10px;
-  background: linear-gradient(45deg, #00FFFF, #00CED1);
-  border: none;
-  border-radius: 12px;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
-  text-shadow: 1px 1px 2px white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-#mute:hover {
-  transform: scale(1.05);
-  background: linear-gradient(45deg, #00CED1, #20B2AA);
-  box-shadow: 0 0 10px #00FFFF;
-}
-
-/* Mute icon */
-#mute::before {
-  content: "🔊";
-  font-size: 22px;
-  transition: transform 0.3s;
-}
-
-#mute.muted::before {
-  content: "🔇";
-  transform: rotate(-10deg);
-}
-
-/* ==============================
    GAME OVER MODAL
    ============================== */
 #gameOverModal {
@@ -226,8 +188,45 @@ h2 {
 }
 
 /* ==============================
-   UNIFIED BUTTON FONT
+   MUTE BUTTON
    ============================== */
+#mute {
+  font-size: 20px;
+  padding: 8px 20px;
+  margin-left: 10px;
+  background: linear-gradient(45deg, #00FFFF, #00CED1);
+  border: none;
+  border-radius: 12px;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+  text-shadow: 1px 1px 2px white;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#mute:hover {
+  transform: scale(1.05);
+  background: linear-gradient(45deg, #00CED1, #20B2AA);
+  box-shadow: 0 0 10px #00FFFF;
+}
+
+/* Icon inside mute button */
+#mute::before {
+  content: "🔊";
+  font-size: 22px;
+  transition: transform 0.2s;
+}
+
+/* Muted state with icon swap */
+#mute.muted::before {
+  content: "🔇";
+  transform: rotate(-10deg);
+}
+
+/* Make buttons cohesive */
 #start, #mute, #playAgain {
   font-family: 'Comic Sans MS', 'Comic Sans', cursive;
 }
@@ -251,6 +250,6 @@ h2 {
 
   #mute {
     font-size: 18px;
-    padding: 6px 15px;
+    padding: 6px 16px;
   }
 }
