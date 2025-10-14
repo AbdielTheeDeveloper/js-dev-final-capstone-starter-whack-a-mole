@@ -10,6 +10,7 @@ const modal = document.getElementById('gameOverModal');
 const finalScore = document.getElementById('finalScore');
 const playAgainButton = document.getElementById('playAgain');
 const muteToggle = document.getElementById('mute');
+const body = document.body;
 
 // ==============================
 // GAME VARIABLES
@@ -26,7 +27,7 @@ const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/ma
 const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
 
 // ==============================
-// UTILITY FUNCTIONSs
+// UTILITY FUNCTIONS
 // ==============================
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -143,11 +144,13 @@ function stopGame() {
 
 function gameOver() {
   finalScore.textContent = points;
-  modal.style.display = "flex"; // show modal
+  modal.style.display = "flex";
+  body.classList.add('blurred'); // blur background
 }
 
 function closeModal() {
   modal.style.display = "none";
+  body.classList.remove('blurred');
 }
 
 function startGame() {
@@ -158,7 +161,7 @@ function startGame() {
   startTimer();
   showUp();
   loopAudio(song);
-  setEventListeners(); // <-- make sure all handlers are active
+  setEventListeners();
 }
 
 // ==============================
@@ -169,7 +172,7 @@ function setEventListeners() {
     mole.removeEventListener('click', whack);
     mole.addEventListener('click', whack);
 
-    // Accessibility: keyboard whack
+    // Accessibility & keyboard control
     mole.setAttribute('tabindex', '0');
     mole.setAttribute('role', 'button');
     mole.setAttribute('aria-label', 'Whack the dog');
@@ -181,8 +184,11 @@ function setEventListeners() {
   });
 
   playAgainButton.addEventListener('click', startGame);
+
+  // Mute toggle with icon and class
   muteToggle.addEventListener('click', () => {
     muted = !muted;
+    muteToggle.classList.toggle('muted', muted);
     muteToggle.textContent = muted ? 'Unmute' : 'Mute';
   });
 }
@@ -191,7 +197,6 @@ function setEventListeners() {
 // INITIALIZE
 // ==============================
 startButton.addEventListener("click", startGame);
-
 
 
 
