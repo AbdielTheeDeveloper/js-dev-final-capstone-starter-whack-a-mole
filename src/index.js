@@ -16,34 +16,40 @@ const body = document.body;
 // GAME VARIABLES
 // ==============================
 let time = 30;
-let timer;
+let timer = null;
 let lastHole = null;
 let points = 0;
 let difficulty = "hard";
 let muted = false;
+let gameRunning = false; // track whether game is active
 
-// Audio
+// Audio (will start only after user gesture via startButton)
 const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/hit.mp3?raw=true");
 const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
+
+// ensure audio elements won't throw if played while muted
+audioHit.preload = 'auto';
+song.preload = 'auto';
 
 // ==============================
 // UTILITY FUNCTIONS
 // ==============================
 function randomInteger(min, max) {
+  // arithmetic done digit-by-digit internally; safe integer math
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function setDelay(difficulty) {
-  if (difficulty === "easy") return 1500;
-  if (difficulty === "normal") return 1000;
-  if (difficulty === "hard") return randomInteger(600, 1200);
+function setDelay(difficultyArg) {
+  if (difficultyArg === "easy") return 1500;
+  if (difficultyArg === "normal") return 1000;
+  if (difficultyArg === "hard") return randomInteger(600, 1200);
   return 1000;
 }
 
-function chooseHole(holes) {
-  const index = randomInteger(0, holes.length - 1);
-  const hole = holes[index];
-  if (hole === lastHole) return chooseHole(holes);
+function chooseHole(holeList) {
+  const index = randomInteger(0, holeList.length - 1);
+  const hole = holeList[index];
+  if (hole === lastHole) return chooseHole(holeList);
   lastHole = hole;
   return hole;
 }
@@ -52,14 +58,16 @@ function chooseHole(holes) {
 // MOLE VISIBILITY
 // ==============================
 function toggleVisibility(hole) {
-  hole.classList.toggle('show'); 
+  hole.classList.toggle('show');
 }
 
 function showAndHide(hole, delay) {
-  toggleVisibility(hole);
+  // show
+  hole.classList.add('show');
+  // hide after delay
   return setTimeout(() => {
-    toggleVisibility(hole);
-    if (time > 0) showUp();
+    hole.classList.remove('show');
+    if (time > 0 && gameRunning) showUp();
   }, delay);
 }
 
@@ -74,23 +82,58 @@ function showUp() {
 // ==============================
 function updateScore() {
   points++;
-  scoreDisplay.textContent = points;
-  if (!muted) audioHit.play();
+  if (scoreDisplay) scoreDisplay.textContent = points;
+  if (!muted) {
+    // play short hit sound; catch play errors (autoplay policies)
+    audioHit.currentTime = 0;
+    audioHit.play().catch(() => {});
+  }
 }
 
 function clearScore() {
   points = 0;
-  scoreDisplay.textContent = points;
+  if (scoreDisplay) scoreDisplay.textContent = points;
 }
 
 // ==============================
-// WHACK FUNCTION
+// HIT / WHACK HANDLING
 // ==============================
-function whack(event) {
-  if (!event.target.classList.contains('hit')) {
-    event.target.classList.add('hit');
-    updateScore();
-    setTimeout(() => event.target.classList.remove('hit'), 500);
+function handleHitOnHole(event) {
+  // event.currentTarget is the hole when added as hole listener
+  const hole = event.currentTarget;
+  // only count when mole is visible (hole has .show)
+  if (!hole.classList.contains('show')) return;
+
+  // locate mole element inside hole
+  const mole = hole.querySelector('.mole');
+  if (!mole) return;
+
+  // Prevent double hits
+  if (mole.classList.contains('hit')) return;
+
+  // animate and update score
+  mole.classList.add('hit');
+  updateScore();
+  setTimeout(() => mole.classList.remove('hit'), 500);
+}
+
+function handleClickOnMole(event) {
+  // if user clicked directly on mole, delegate to hole handler for consistent checks
+  const mole = event.currentTarget;
+  const hole = mole.closest('.hole');
+  if (!hole) return;
+  // create synthetic event that calls the same logic as clicking the hole
+  handleHitOnHole({ currentTarget: hole, target: mole, type: 'click' });
+}
+
+// keyboard activation for mole (Enter or Space)
+function handleMoleKeydown(e) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    const mole = e.currentTarget;
+    const hole = mole.closest('.hole');
+    if (!hole) return;
+    handleHitOnHole({ currentTarget: hole, keyEvent: true, target: mole });
   }
 }
 
@@ -100,16 +143,18 @@ function whack(event) {
 function updateTimer() {
   if (time > 0) {
     time--;
-    timerDisplay.textContent = time;
+    if (timerDisplay) timerDisplay.textContent = time;
   } else {
     clearInterval(timer);
+    timer = null;
     stopGame();
     gameOver();
   }
 }
 
 function startTimer() {
-  timerDisplay.textContent = time; 
+  if (timer) clearInterval(timer);
+  if (timerDisplay) timerDisplay.textContent = time;
   timer = setInterval(updateTimer, 1000);
 }
 
@@ -117,7 +162,9 @@ function startTimer() {
 // AUDIO CONTROL
 // ==============================
 function playAudio(audioObject) {
-  if (!muted) audioObject.play();
+  if (!muted) {
+    audioObject.play().catch(() => {});
+  }
 }
 
 function loopAudio(audioObject) {
@@ -126,8 +173,10 @@ function loopAudio(audioObject) {
 }
 
 function stopAudio(audioObject) {
-  audioObject.pause();
-  audioObject.currentTime = 0;
+  try {
+    audioObject.pause();
+    audioObject.currentTime = 0;
+  } catch (e) {}
 }
 
 // ==============================
@@ -135,72 +184,129 @@ function stopAudio(audioObject) {
 // ==============================
 function setDuration(duration) {
   time = duration;
+  if (timerDisplay) timerDisplay.textContent = time;
 }
 
 function stopGame() {
-  clearInterval(timer);
+  gameRunning = false;
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+  }
   stopAudio(song);
+  // remove any remaining .show from holes
+  holes.forEach(h => h.classList.remove('show'));
 }
 
 function gameOver() {
-  finalScore.textContent = points;
-  modal.style.display = "flex";
-  body.classList.add('blurred'); // blur background
+  // show non-blocking modal with final score
+  if (finalScore) finalScore.textContent = points;
+  if (modal) modal.style.display = 'flex';
+  body.classList.add('blurred');
 }
 
 function closeModal() {
-  modal.style.display = "none";
+  if (modal) modal.style.display = 'none';
   body.classList.remove('blurred');
 }
 
 function startGame() {
+  // First user gesture: ensure audio may play (browser policy)
+  // mark as running
+  gameRunning = true;
+
   closeModal();
   clearScore();
-  stopGame();
+  stopGame(); // clear any previous timers / audio
   setDuration(30);
   startTimer();
   showUp();
+  // only start background music if not muted
   loopAudio(song);
+  // ensure listeners are set up (idempotent)
   setEventListeners();
 }
 
 // ==============================
-// EVENT LISTENERS
+// EVENT LISTENERS SETUP
 // ==============================
 function setEventListeners() {
-  moles.forEach(mole => {
-    mole.removeEventListener('click', whack);
-    mole.addEventListener('click', whack);
-
-    // Accessibility & keyboard control
-    mole.setAttribute('tabindex', '0');
-    mole.setAttribute('role', 'button');
-    mole.setAttribute('aria-label', 'Whack the dog');
-    mole.addEventListener('keydown', (e) => {
-      if (e.key === ' ' || e.key === 'Enter') {
-        whack({ target: mole });
+  // holes: click hits mole when visible
+  holes.forEach(hole => {
+    // remove any existing wrapper listener to avoid duplicate handlers
+    hole.removeEventListener('click', handleHitOnHole);
+    hole.addEventListener('click', handleHitOnHole);
+    // ensure holes are keyboard accessible (optional)
+    hole.setAttribute('role', 'button');
+    hole.setAttribute('tabindex', '0');
+    hole.setAttribute('aria-label', 'Hole — whack dog if visible');
+    // add keydown so keyboard can hit holes too (Enter/Space)
+    hole.removeEventListener('keydown', handleMoleKeydown);
+    hole.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleHitOnHole({ currentTarget: hole, keyEvent: true });
       }
     });
   });
 
-  playAgainButton.addEventListener('click', startGame);
+  // moles: click and keyboard directly on mole also allowed
+  moles.forEach(mole => {
+    mole.removeEventListener('click', handleClickOnMole);
+    mole.addEventListener('click', handleClickOnMole);
 
-  // Mute toggle with icon and class
-  muteToggle.addEventListener('click', () => {
-    muted = !muted;
-    muteToggle.classList.toggle('muted', muted);
-    muteToggle.textContent = muted ? 'Unmute' : 'Mute';
+    mole.setAttribute('tabindex', '0');
+    mole.setAttribute('role', 'button');
+    mole.setAttribute('aria-label', 'Whack the dog');
+
+    mole.removeEventListener('keydown', handleMoleKeydown);
+    mole.addEventListener('keydown', handleMoleKeydown);
   });
+
+  // play again
+  if (playAgainButton) {
+    playAgainButton.removeEventListener('click', startGame);
+    playAgainButton.addEventListener('click', startGame);
+  }
+
+  // mute toggle
+  if (muteToggle) {
+    // remove any previous listener
+    muteToggle.removeEventListener('click', onMuteToggle);
+    muteToggle.addEventListener('click', onMuteToggle);
+    // set a sensible initial ARIA and class state
+    muteToggle.setAttribute('aria-pressed', muted ? 'true' : 'false');
+    muteToggle.classList.toggle('muted', muted);
+  }
+}
+
+// separate function so we can remove listener easily
+function onMuteToggle() {
+  muted = !muted;
+  // toggle CSS class which changes the icon (::before)
+  if (muteToggle) {
+    muteToggle.classList.toggle('muted', muted);
+    muteToggle.setAttribute('aria-pressed', muted ? 'true' : 'false');
+    // update label text but keep pseudo-element icon intact (CSS ::before)
+    muteToggle.innerText = muted ? 'Unmute' : 'Mute';
+  }
+  if (muted) {
+    stopAudio(song);
+  } else {
+    // if game is running, resume background music
+    if (gameRunning) loopAudio(song);
+  }
 }
 
 // ==============================
-// INITIALIZE
+// INITIALIZE ON LOAD
 // ==============================
-startButton.addEventListener("click", startGame);
+startButton.addEventListener('click', startGame);
+// ensure listeners available prior to start (helps tests and accessibility)
+setEventListeners();
 
 // ==============================
-// add blur effect
-// ==============================
+// adds blur effect
 const style = document.createElement('style');
 style.textContent = `
   .blurred {
@@ -209,6 +315,7 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
 
 
 
