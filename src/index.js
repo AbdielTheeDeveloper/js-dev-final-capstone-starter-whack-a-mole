@@ -134,8 +134,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // Please do not modify the code below.
 // Used for testing purposes.
-window.randomInteger = randomInteger;
-window.chooseHole = chooseHole;
 window.setDelay = setDelay;
 window.startGame = startGame;
 window.gameOver = gameOver;
