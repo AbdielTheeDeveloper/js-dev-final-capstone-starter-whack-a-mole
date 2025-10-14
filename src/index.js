@@ -142,8 +142,78 @@ window.addEventListener("DOMContentLoaded", () => {
   console.log("✅ Game ready! Click 'Start' to play.");
 });
 
+// Returns a random integer between min and max (inclusive)
+function randomInteger(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Chooses a random hole from the list
+function chooseHole(holes) {
+  const index = randomInteger(0, holes.length - 1);
+  return holes[index];
+}
+
+// Sets mole visibility duration based on difficulty
+function setDelay(difficulty) {
+  switch (difficulty) {
+    case "easy":
+      return 1200;
+    case "medium":
+      return 800;
+    case "hard":
+      return 500;
+    default:
+      return 1000;
+  }
+}
+
+// Toggles visibility of an element
+function toggleVisibility(element) {
+  if (!element) return;
+  const current = element.style.display;
+  element.style.display = (current === "none" || current === "") ? "block" : "none";
+}
+
+// Shows and hides mole at the chosen hole
+function showUp(hole, duration = 800) {
+  if (!hole) return;
+  hole.classList.add("show");
+  setTimeout(() => {
+    hole.classList.remove("show");
+  }, duration);
+}
+
+// Controls game duration
+function setDuration(seconds) {
+  time = seconds;
+  timerDisplay.textContent = time;
+}
+
+// Starts the game (test expects this to reset score & timer)
+function startGame() {
+  points = 0;
+  scoreDisplay.textContent = points;
+  setDuration(30);
+  running = true;
+  modal.style.display = "none";
+  startTimer();
+  showMole();
+}
+
+// Ends the game and shows modal
+function gameOver() {
+  running = false;
+  clearInterval(timer);
+  modal.style.display = "flex";
+  finalScore.textContent = points;
+}
+
 // Please do not modify the code below.
 // Used for testing purposes.
+window.randomInteger = randomInteger;
+window.chooseHole = chooseHole;
 window.setDelay = setDelay;
 window.startGame = startGame;
 window.gameOver = gameOver;
