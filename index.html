@@ -1,53 +1,45 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
+    <title>Whack-a-Dog</title>
     <link rel="stylesheet" href="./src/styles.css">
   </head>
   <body>
-    <h1 id="title"> Whack-a-dog </h1>
+    <h1 id="title">Whack-a-Dog</h1>
     <div>
-      <div>
-        <h2>Click start to play!</h2>
-      </div>
-      <div>
-        <h2>score: <span id="score">0</span></h2>
-      </div>
-      <div>
-          <h2><span id="timer">0</span> seconds left.</h2>
-      </div>
+      <h2>Click start to play!</h2>
+      <h2>Score: <span id="score">0</span></h2>
+      <h2><span id="timer">0</span> seconds left.</h2>
       <div>
         <button id="start">Start</button>
+        <button id="mute">Mute</button>
       </div>
     </div>
+
+    <div class="grid" role="grid" aria-label="Whack-a-Dog holes">
+      <div id="hole0" class="hole"><div id="mole0" class="mole"></div></div>
+      <div id="hole1" class="hole"><div id="mole1" class="mole"></div></div>
+      <div id="hole2" class="hole"><div id="mole2" class="mole"></div></div>
+      <div id="hole3" class="hole"><div id="mole3" class="mole"></div></div>
+      <div id="hole4" class="hole"><div id="mole4" class="mole"></div></div>
+      <div id="hole5" class="hole"><div id="mole5" class="mole"></div></div>
+      <div id="hole6" class="hole"><div id="mole6" class="mole"></div></div>
+      <div id="hole7" class="hole"><div id="mole7" class="mole"></div></div>
+      <div id="hole8" class="hole"><div id="mole8" class="mole"></div></div>
     </div>
-    <div class="grid">
-  <div id="hole0" class="hole">
-    <div id="mole0" class="mole"></div>
-  </div>
-  <div id="hole1" class="hole">
-    <div id="mole1" class="mole"></div>
-  </div>
-  <div id="hole2" class="hole">
-    <div id="mole2" class="mole"></div>
-  </div>
-  <div id="hole3" class="hole">
-    <div id="mole3" class="mole"></div>
-  </div>
-  <div id="hole4" class="hole">
-    <div id="mole4" class="mole"></div>
-  </div>
-  <div id="hole5" class="hole">
-    <div id="mole5" class="mole"></div>
-  </div>
-  <div id="hole6" class="hole">
-    <div id="mole6" class="mole"></div>
-  </div>
-  <div id="hole7" class="hole">
-    <div id="mole7" class="mole"></div>
-  </div>
-  <div id="hole8" class="hole">
-    <div id="mole8" class="mole"></div>
-  </div>
-</div>
-    <script src="./src/index.js"></script>
-  </body>
-</html>
+
+    <!-- Non-blocking Game Over Modal -->
+    <div id="gameOverModal" style="
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      color: white;
+      font-family: 'Comic Sans MS';
+      text-align: center;
+
