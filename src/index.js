@@ -40,11 +40,21 @@ window.addEventListener("DOMContentLoaded", () => {
   function showMole() {
     if (!running) return;
     const hole = randomHole();
+    const showTime = Math.random() * 800 + 600; // How long mole stays up
+    
     hole.classList.add("show");
+    
     setTimeout(() => {
       hole.classList.remove("show");
-      if (running) showMole();
-    }, Math.random() * 800 + 400);
+    }, showTime);
+  }
+  
+  // Spawn moles continuously
+  function spawnMoles() {
+    if (!running) return;
+    showMole();
+    const nextMoleTime = Math.random() * 600 + 400; // Time until next mole
+    setTimeout(spawnMoles, nextMoleTime);
   }
 
   // Update timer
