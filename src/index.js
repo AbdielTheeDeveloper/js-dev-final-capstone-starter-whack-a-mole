@@ -6,15 +6,20 @@ const moles = document.querySelectorAll('.mole');
 const startButton = document.getElementById('start');
 const scoreDisplay = document.getElementById('score');
 const timerDisplay = document.getElementById('timer');
+const modal = document.getElementById('gameOverModal');
+const finalScore = document.getElementById('finalScore');
+const playAgainButton = document.getElementById('playAgain');
+const muteToggle = document.getElementById('mute');
 
 // ==============================
 // GAME VARIABLES
 // ==============================
-let time = 30; // game duration in seconds
+let time = 30;
 let timer;
 let lastHole = null;
 let points = 0;
 let difficulty = "hard";
+let muted = false;
 
 // Audio
 const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/hit.mp3?raw=true");
@@ -31,7 +36,7 @@ function setDelay(difficulty) {
   if (difficulty === "easy") return 1500;
   if (difficulty === "normal") return 1000;
   if (difficulty === "hard") return randomInteger(600, 1200);
-  return 1000; // default
+  return 1000;
 }
 
 function chooseHole(holes) {
@@ -68,13 +73,13 @@ function showUp() {
 // ==============================
 function updateScore() {
   points++;
-  if (scoreDisplay) scoreDisplay.textContent = points;
-  audioHit.play();
+  scoreDisplay.textContent = points;
+  if (!muted) audioHit.play();
 }
 
 function clearScore() {
   points = 0;
-  if (scoreDisplay) scoreDisplay.textContent = points;
+  scoreDisplay.textContent = points;
 }
 
 // ==============================
@@ -94,16 +99,16 @@ function whack(event) {
 function updateTimer() {
   if (time > 0) {
     time--;
-    if (timerDisplay) timerDisplay.textContent = time;
+    timerDisplay.textContent = time;
   } else {
     clearInterval(timer);
     stopGame();
-    alert(`Game Over! Your score: ${points}`);
+    gameOver();
   }
 }
 
 function startTimer() {
-  if (timerDisplay) timerDisplay.textContent = time; 
+  timerDisplay.textContent = time; 
   timer = setInterval(updateTimer, 1000);
 }
 
@@ -111,7 +116,7 @@ function startTimer() {
 // AUDIO CONTROL
 // ==============================
 function playAudio(audioObject) {
-  audioObject.play();
+  if (!muted) audioObject.play();
 }
 
 function loopAudio(audioObject) {
@@ -136,20 +141,57 @@ function stopGame() {
   stopAudio(song);
 }
 
+function gameOver() {
+  finalScore.textContent = points;
+  modal.style.display = "flex"; // show modal
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
 function startGame() {
+  closeModal();
   clearScore();
   stopGame();
   setDuration(30);
   startTimer();
   showUp();
   loopAudio(song);
+  setEventListeners(); // <-- make sure all handlers are active
+}
+
+// ==============================
+// EVENT LISTENERS
+// ==============================
+function setEventListeners() {
+  moles.forEach(mole => {
+    mole.removeEventListener('click', whack);
+    mole.addEventListener('click', whack);
+
+    // Accessibility: keyboard whack
+    mole.setAttribute('tabindex', '0');
+    mole.setAttribute('role', 'button');
+    mole.setAttribute('aria-label', 'Whack the dog');
+    mole.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') {
+        whack({ target: mole });
+      }
+    });
+  });
+
+  playAgainButton.addEventListener('click', startGame);
+  muteToggle.addEventListener('click', () => {
+    muted = !muted;
+    muteToggle.textContent = muted ? 'Unmute' : 'Mute';
+  });
 }
 
 // ==============================
 // INITIALIZE
 // ==============================
-moles.forEach(mole => mole.addEventListener('click', whack));
 startButton.addEventListener("click", startGame);
+
 
 
 
