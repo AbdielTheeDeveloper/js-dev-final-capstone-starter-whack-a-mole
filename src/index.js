@@ -26,7 +26,7 @@ const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/ma
 const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
 
 // ==============================
-// UTILITY FUNCTIONS
+// UTILITY FUNCTIONSs
 // ==============================
 function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
