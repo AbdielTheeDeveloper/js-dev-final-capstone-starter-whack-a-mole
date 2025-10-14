@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Whack-a-Dog</title>
-    <link rel="stylesheet" href="./src/styles.css">
+    <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
     <h1 id="title">Whack-a-Dog</h1>
-    <div>
+    <div id="gameInfo">
       <h2>Click start to play!</h2>
       <h2>Score: <span id="score">0</span></h2>
       <h2><span id="timer">0</span> seconds left.</h2>
-      <div>
+      <div id="controls">
         <button id="start">Start</button>
         <button id="mute">Mute</button>
       </div>
@@ -29,24 +29,13 @@
       <div id="hole8" class="hole"><div id="mole8" class="mole"></div></div>
     </div>
 
-    <!-- Non-blocking Game Over Modal -->
-    <div id="gameOverModal" style="
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      color: white;
-      font-family: 'Comic Sans MS';
-      text-align: center;
-      z-index: 999;
-    ">
-      <h2>Game Over!</h2>
-      <p>Your final score: <span id="finalScore">0</span></p>
-      <button id="playAgain">Play Again</button>
+    <!-- Game Over Modal -->
+    <div id="gameOverModal">
+      <div>
+        <h2>Game Over!</h2>
+        <p>Your final score: <span id="finalScore">0</span></p>
+        <button id="playAgain">Play Again</button>
+      </div>
     </div>
 
     <script src="./src/index.js"></script>
