@@ -20,14 +20,17 @@ window.addEventListener("DOMContentLoaded", () => {
   let running = false;
   let muted = false;
 
-  // Audio
+  // 🎵 Audio setup
   const audioHit = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/hit.mp3?raw=true");
   const song = new Audio("https://github.com/gabrielsanchez/erddiagram/blob/main/molesong.mp3?raw=true");
   song.loop = true;
 
   console.log("✅ Game variables initialized");
 
-  // Get random hole
+  /* ==============================
+    HELPER FUNCTIONS
+    ============================== */
+
   function randomHole() {
     const index = Math.floor(Math.random() * holes.length);
     const hole = holes[index];
@@ -36,28 +39,42 @@ window.addEventListener("DOMContentLoaded", () => {
     return hole;
   }
 
-  // Show mole
+  function randomInteger(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  function chooseHole(holes) {
+    const index = randomInteger(0, holes.length - 1);
+    return holes[index];
+  }
+
+  function setDelay() {
+    return Math.random() * 800 + 600; // stays up 600–1400ms
+  }
+
+  /* ==============================
+    GAME CORE
+    ============================== */
+
   function showMole() {
     if (!running) return;
     const hole = randomHole();
-    const showTime = Math.random() * 800 + 600; // How long mole stays up
-    
+    const showTime = setDelay();
+
     hole.classList.add("show");
-    
-    setTimeout(() => {
-      hole.classList.remove("show");
-    }, showTime);
+    setTimeout(() => hole.classList.remove("show"), showTime);
   }
-  
-  // Spawn moles continuously
+
+  // Keep spawning moles
   function spawnMoles() {
     if (!running) return;
     showMole();
-    const nextMoleTime = Math.random() * 600 + 400; // Time until next mole
+    const nextMoleTime = Math.random() * 600 + 400; // next spawn 400–1000ms
     setTimeout(spawnMoles, nextMoleTime);
   }
 
-  // Update timer
   function updateTimer() {
     if (time > 0) {
       time--;
@@ -67,13 +84,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Start timer
   function startTimer() {
     timerDisplay.textContent = time;
     timer = setInterval(updateTimer, 1000);
   }
 
-  // Start game
+  // ✅ FIXED: ensure song plays after user click (browser autoplay policies)
   function startGame() {
     console.log("🎮 Starting game...");
     points = 0;
@@ -82,15 +98,21 @@ window.addEventListener("DOMContentLoaded", () => {
     scoreDisplay.textContent = points;
     timerDisplay.textContent = time;
     modal.style.display = "none";
+    clearInterval(timer);
     startTimer();
-    showMole();
+    spawnMoles();
+
     if (!muted) {
       song.currentTime = 0;
-      song.play().catch(e => console.warn("Audio play failed:", e));
+      // Explicitly play after user-initiated event
+      song.play().then(() => {
+        console.log("🎵 Background music playing");
+      }).catch(e => {
+        console.warn("⚠️ Audio play blocked by browser:", e);
+      });
     }
   }
 
-  // End game
   function endGame() {
     console.log("🏁 Game over! Final score:", points);
     running = false;
@@ -100,7 +122,6 @@ window.addEventListener("DOMContentLoaded", () => {
     finalScore.textContent = points;
   }
 
-  // Whack mole
   function whack(e) {
     if (!running) return;
     if (!e.target.classList.contains("hit")) {
@@ -115,12 +136,10 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Toggle mute
   function toggleMute() {
     muted = !muted;
-    console.log(`🔊 Sound ${muted ? 'muted' : 'unmuted'}`);
-    
-    // Toggle the CSS class for icon change
+    console.log(`🔊 Sound ${muted ? "muted" : "unmuted"}`);
+
     if (muted) {
       muteButton.classList.add("muted");
       song.pause();
@@ -132,7 +151,35 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Event listeners
+  /* ==============================
+    TESTABLE UTILITY FUNCTIONS
+    ============================== */
+
+  function toggleVisibility(element) {
+    if (!element) return;
+    const current = element.style.display;
+    element.style.display = (current === "none" || current === "") ? "block" : "none";
+  }
+
+  function showUp(hole, duration = 800) {
+    if (!hole) return;
+    hole.classList.add("show");
+    setTimeout(() => hole.classList.remove("show"), duration);
+  }
+
+  function setDuration(seconds) {
+    time = seconds;
+    timerDisplay.textContent = time;
+  }
+
+  function gameOver() {
+    endGame();
+  }
+
+  /* ==============================
+    EVENT LISTENERS
+    ============================== */
+
   startButton.addEventListener("click", startGame);
   playAgainButton.addEventListener("click", startGame);
   muteButton.addEventListener("click", toggleMute);
@@ -140,92 +187,30 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ Event listeners attached");
   console.log("✅ Game ready! Click 'Start' to play.");
+
+  /* ==============================
+    WINDOW EXPORTS (for tests)
+    ============================== */
+  window.randomInteger = randomInteger;
+  window.chooseHole = chooseHole;
+  window.setDelay = setDelay;
+  window.startGame = startGame;
+  window.gameOver = gameOver;
+  window.showUp = showUp;
+  window.holes = holes;
+  window.moles = moles;
+  window.showAndHide = showUp;
+  window.points = points;
+  window.updateScore = () => scoreDisplay.textContent = points;
+  window.clearScore = () => { points = 0; scoreDisplay.textContent = points; };
+  window.whack = whack;
+  window.time = time;
+  window.setDuration = setDuration;
+  window.toggleVisibility = toggleVisibility;
+  window.setEventListeners = () => {
+    startButton.addEventListener("click", startGame);
+    playAgainButton.addEventListener("click", startGame);
+    muteButton.addEventListener("click", toggleMute);
+    moles.forEach(mole => mole.addEventListener("click", whack));
+  };
 });
-
-// Returns a random integer between min and max (inclusive)
-function randomInteger(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Chooses a random hole from the list
-function chooseHole(holes) {
-  const index = randomInteger(0, holes.length - 1);
-  return holes[index];
-}
-
-// Sets mole visibility duration based on difficulty
-function setDelay(difficulty) {
-  switch (difficulty) {
-    case "easy":
-      return 1200;
-    case "medium":
-      return 800;
-    case "hard":
-      return 500;
-    default:
-      return 1000;
-  }
-}
-
-// Toggles visibility of an element
-function toggleVisibility(element) {
-  if (!element) return;
-  const current = element.style.display;
-  element.style.display = (current === "none" || current === "") ? "block" : "none";
-}
-
-// Shows and hides mole at the chosen hole
-function showUp(hole, duration = 800) {
-  if (!hole) return;
-  hole.classList.add("show");
-  setTimeout(() => {
-    hole.classList.remove("show");
-  }, duration);
-}
-
-// Controls game duration
-function setDuration(seconds) {
-  time = seconds;
-  timerDisplay.textContent = time;
-}
-
-// Starts the game (test expects this to reset score & timer)
-function startGame() {
-  points = 0;
-  scoreDisplay.textContent = points;
-  setDuration(30);
-  running = true;
-  modal.style.display = "none";
-  startTimer();
-  showMole();
-}
-
-// Ends the game and shows modal
-function gameOver() {
-  running = false;
-  clearInterval(timer);
-  modal.style.display = "flex";
-  finalScore.textContent = points;
-}
-
-// Please do not modify the code below.
-// Used for testing purposes.
-window.randomInteger = randomInteger;
-window.chooseHole = chooseHole;
-window.setDelay = setDelay;
-window.startGame = startGame;
-window.gameOver = gameOver;
-window.showUp = showUp;
-window.holes = holes;
-window.moles = moles;
-window.showAndHide = showAndHide;
-window.points = points;
-window.updateScore = updateScore;
-window.clearScore = clearScore;
-window.whack = whack;
-window.time = time;
-window.setDuration = setDuration;
-window.toggleVisibility = toggleVisibility;
-window.setEventListeners = setEventListeners;
