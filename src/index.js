@@ -198,6 +198,19 @@ function setEventListeners() {
 // ==============================
 startButton.addEventListener("click", startGame);
 
+// ==============================
+// add blur effect
+// ==============================
+const style = document.createElement('style');
+style.textContent = `
+  .blurred {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+  }
+`;
+document.head.appendChild(style);
+
+
 
 
 // Please do not modify the code below.
