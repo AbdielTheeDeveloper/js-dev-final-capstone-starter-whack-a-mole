@@ -253,3 +253,25 @@ h2 {
     padding: 6px 16px;
   }
 }
+
+/* ==============================
+   FIX PAGE OVERFLOW / CENTER GAME
+   ============================== */
+html, body {
+  height: 100%;
+  overflow: hidden; /* Prevents vertical scrollbars */
+}
+
+body {
+  justify-content: flex-start; /* keeps title visible */
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+main, .game-container {
+  max-height: 90vh;         /* ensure content fits screen */
+  overflow: auto;           /* scroll internally if needed on small screens */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
