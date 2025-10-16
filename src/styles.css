@@ -254,16 +254,19 @@ h2 {
   }
 }
 
-/* ==============================
-   TRUE FIX FOR OVERFLOWING PAGE
-   ============================== */
+/* ========================================
+   FINAL RESPONSIVE FIX — NO OVERFLOW
+   ======================================== */
+
+/* Keep page inside viewport */
 html, body {
-  height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* stop page scroll */
+  height: 100%;
+  overflow: hidden;
 }
 
+/* Center layout vertically and horizontally */
 body {
   display: flex;
   flex-direction: column;
@@ -273,29 +276,43 @@ body {
   box-sizing: border-box;
 }
 
-/* Make the grid dynamically scale with screen height */
-.grid {
-  width: min(90vw, 600px);
-  height: calc(100vh - 280px); /* subtract top content height */
-  max-height: 60vh;            /* never exceed 60% of screen */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin: 10px auto;
-  box-sizing: border-box;
+/* Make everything scale with viewport */
+#title {
+  font-size: 8vh;         /* responsive heading */
+  margin-top: 2vh;
+  margin-bottom: 1vh;
 }
 
-/* Keep holes square and responsive */
+#gameInfo {
+  text-align: center;
+  margin-bottom: 1vh;
+}
+
+/* Responsive grid that *always* fits screen */
+.grid {
+  width: 90vw;
+  max-width: 600px;
+  height: 50vh;            /* occupies half the viewport height */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 1.5vh;              /* proportional spacing */
+  justify-items: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+/* Make holes square and scalable */
 .hole {
-  flex: 1 0 30%;
-  margin: 5px;
-  position: relative;
+  width: 100%;
   aspect-ratio: 1 / 1;
+  position: relative;
+  border: 0.4vh solid black;
+  border-radius: 1vh;
   overflow: hidden;
 }
 
-/* Scale mole inside hole */
+/* Moles scale dynamically within holes */
 .mole {
   position: absolute;
   bottom: -100%;
@@ -306,31 +323,31 @@ body {
   background-size: contain;
 }
 
-/* Adjust top text spacing */
-#title {
-  margin-top: 2vh;
-  margin-bottom: 0;
+/* Buttons and text scale */
+#start, #mute {
+  font-size: 2.5vh;
+  padding: 1vh 3vh;
+  margin: 1vh;
 }
 
-#gameInfo {
-  margin-top: 0.5vh;
-  margin-bottom: 0.5vh;
+/* Modal fix: fully centered and responsive */
+#gameOverModal > div {
+  width: 80vw;
+  max-width: 400px;
+  padding: 4vh 2vh;
+  font-size: 2.5vh;
 }
 
-/* Responsive tweaks for smaller devices */
-@media (max-height: 700px) {
+/* Smaller devices: scale down slightly */
+@media (max-width: 600px), (max-height: 700px) {
+  #title {
+    font-size: 6vh;
+  }
   .grid {
-    height: calc(100vh - 240px);
-    max-height: 55vh;
-  }
-  h1 {
-    font-size: 8vw;
-  }
-  h2 {
-    font-size: 4vw;
+    height: 45vh;
+    gap: 1vh;
   }
   #start, #mute {
-    font-size: 4vw;
-    padding: 5px 10px;
+    font-size: 2vh;
   }
 }
