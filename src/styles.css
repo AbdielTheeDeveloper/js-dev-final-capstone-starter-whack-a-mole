@@ -255,23 +255,71 @@ h2 {
 }
 
 /* ==============================
-   FIX PAGE OVERFLOW / CENTER GAME
+   RESPONSIVE HEIGHT & GRID FIX
    ============================== */
 html, body {
   height: 100%;
-  overflow: hidden; /* Prevents vertical scrollbars */
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling */
 }
 
 body {
-  justify-content: flex-start; /* keeps title visible */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   height: 100vh;
   box-sizing: border-box;
 }
 
-main, .game-container {
-  max-height: 90vh;         /* ensure content fits screen */
-  overflow: auto;           /* scroll internally if needed on small screens */
+/* Limit and auto-resize the grid to viewport height */
+.grid {
+  width: min(90vw, 600px);       /* Shrinks with screen width */
+  height: auto;
+  aspect-ratio: 1 / 1;           /* Keep it roughly square */
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
+  margin: 20px auto;
+}
+
+/* Holes scale dynamically */
+.hole {
+  flex: 1 0 30%;
+  aspect-ratio: 1 / 1;           /* Ensures square holes */
+  height: auto;
+  margin: 5px;
+}
+
+/* Moles scale automatically inside holes */
+.mole {
+  width: 70%;
+  height: 70%;
+  bottom: -100%;
+  background-size: contain;
+}
+
+/* Adjust title and UI spacing */
+#title {
+  margin-top: 2vh;
+}
+
+#gameInfo {
+  margin-bottom: 1vh;
+}
+
+/* Smaller screens: fine-tune spacing and text */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 12vw; /* Scales heading */
+  }
+  h2 {
+    font-size: 5vw;
+  }
+  #start, #mute {
+    font-size: 4vw;
+    padding: 6px 12px;
+  }
 }
