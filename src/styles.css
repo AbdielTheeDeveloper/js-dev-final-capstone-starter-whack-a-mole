@@ -255,13 +255,13 @@ h2 {
 }
 
 /* ==============================
-   RESPONSIVE HEIGHT & GRID FIX
+   TRUE FIX FOR OVERFLOWING PAGE
    ============================== */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; /* Prevent scrolling */
+  overflow: hidden; /* stop page scroll */
 }
 
 body {
@@ -273,53 +273,64 @@ body {
   box-sizing: border-box;
 }
 
-/* Limit and auto-resize the grid to viewport height */
+/* Make the grid dynamically scale with screen height */
 .grid {
-  width: min(90vw, 600px);       /* Shrinks with screen width */
-  height: auto;
-  aspect-ratio: 1 / 1;           /* Keep it roughly square */
+  width: min(90vw, 600px);
+  height: calc(100vh - 280px); /* subtract top content height */
+  max-height: 60vh;            /* never exceed 60% of screen */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  margin: 20px auto;
+  margin: 10px auto;
+  box-sizing: border-box;
 }
 
-/* Holes scale dynamically */
+/* Keep holes square and responsive */
 .hole {
   flex: 1 0 30%;
-  aspect-ratio: 1 / 1;           /* Ensures square holes */
-  height: auto;
   margin: 5px;
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
 }
 
-/* Moles scale automatically inside holes */
+/* Scale mole inside hole */
 .mole {
+  position: absolute;
+  bottom: -100%;
+  left: 50%;
   width: 70%;
   height: 70%;
-  bottom: -100%;
+  transform: translateX(-50%);
   background-size: contain;
 }
 
-/* Adjust title and UI spacing */
+/* Adjust top text spacing */
 #title {
   margin-top: 2vh;
+  margin-bottom: 0;
 }
 
 #gameInfo {
-  margin-bottom: 1vh;
+  margin-top: 0.5vh;
+  margin-bottom: 0.5vh;
 }
 
-/* Smaller screens: fine-tune spacing and text */
-@media (max-width: 600px) {
+/* Responsive tweaks for smaller devices */
+@media (max-height: 700px) {
+  .grid {
+    height: calc(100vh - 240px);
+    max-height: 55vh;
+  }
   h1 {
-    font-size: 12vw; /* Scales heading */
+    font-size: 8vw;
   }
   h2 {
-    font-size: 5vw;
+    font-size: 4vw;
   }
   #start, #mute {
     font-size: 4vw;
-    padding: 6px 12px;
+    padding: 5px 10px;
   }
 }
